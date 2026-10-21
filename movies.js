@@ -1,7 +1,7 @@
 const { put, list, del } = require("@vercel/blob");
 
 // Yahan apna password likho (ya Vercel mein ADMIN_PASSWORD set karo)
-const PASSWORD = process.env.ADMIN_PASSWORD || "badlo-ye-password";
+const PASSWORD = process.env.ADMIN_PASSWORD || "180509";
 
 const FILE = "movies-data.json";
 

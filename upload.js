@@ -1,7 +1,7 @@
 const { handleUpload } = require("@vercel/blob/client");
 
 // Yahan apna password likho (ya Vercel mein ADMIN_PASSWORD set karo)
-const PASSWORD = process.env.ADMIN_PASSWORD || "badlo-ye-password";
+const PASSWORD = process.env.ADMIN_PASSWORD || "180509";
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") return res.status(405).end();

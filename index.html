@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chalchitra – Movies dekho</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #17141f;
+    --surface: #231f31;
+    --paper: #f2ede4;
+    --muted: #a39cb5;
+    --rose: #e8456b;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: "DM Sans", system-ui, sans-serif;
+    line-height: 1.5;
+  }
+  header, main { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+  header { padding-top: 40px; padding-bottom: 28px; }
+  .logo {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.4rem, 8vw, 4.5rem);
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .tag { color: var(--muted); margin-top: 10px; max-width: 46ch; }
+  .search {
+    margin-top: 24px;
+    width: 100%;
+    max-width: 420px;
+    padding: 13px 16px;
+    background: var(--surface);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    color: var(--paper);
+    font: inherit;
+  }
+  .search:focus { outline: none; border-color: var(--rose); }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 22px 16px;
+    padding-bottom: 60px;
+  }
+  .card {
+    background: none; border: 0; color: inherit; font: inherit;
+    text-align: left; cursor: pointer; padding: 0;
+  }
+  .card:focus-visible { outline: 3px solid var(--rose); outline-offset: 4px; border-radius: 8px; }
+  .poster {
+    aspect-ratio: 2 / 3;
+    width: 100%;
+    object-fit: cover;
+    background: var(--surface);
+    border-radius: 8px;
+    display: block;
+    transition: transform .2s;
+  }
+  .card:hover .poster { transform: translateY(-4px); }
+  .card h3 {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 500;
+    font-size: 1.05rem;
+    margin-top: 10px;
+  }
+  .card p { color: var(--muted); font-size: .9rem; }
+  .empty { color: var(--muted); padding: 40px 0; }
+  dialog {
+    width: min(920px, 94vw);
+    background: var(--surface);
+    color: var(--paper);
+    border: 0;
+    border-radius: 14px;
+    padding: 0;
+    margin: auto;
+    overflow: hidden;
+  }
+  dialog::backdrop { background: rgba(10, 8, 16, .8); }
+  .player { aspect-ratio: 16 / 9; background: #000; }
+  .player iframe, .player video { width: 100%; height: 100%; border: 0; display: block; }
+  .info { padding: 18px 22px 24px; }
+  .info h2 { font-family: "Bricolage Grotesque", sans-serif; font-size: 1.6rem; }
+  .info .meta { color: var(--muted); margin: 2px 0 10px; }
+  .close {
+    position: absolute; top: 10px; right: 10px;
+    background: rgba(0,0,0,.6); color: var(--paper);
+    border: 0; border-radius: 8px; padding: 8px 14px;
+    font: inherit; cursor: pointer;
+  }
+  .close:focus-visible { outline: 3px solid var(--rose); }
+  footer { color: var(--muted); font-size: .85rem; text-align: center; padding: 0 20px 40px; }
+</style>
+</head>
+<body>
+<header>
+  <h1 class="logo">Chalchitra</h1>
+  <p class="tag">Aaj kya dekhna hai? Naam ya genre likh ke dhoondho.</p>
+  <input id="q" class="search" type="search" placeholder="Movie dhoondho…" aria-label="Movie dhoondho">
+</header>
+
+<main>
+  <div id="grid" class="grid" aria-live="polite"></div>
+</main>
+
+<dialog id="dlg">
+  <button class="close" id="close">Band karo</button>
+  <div class="player" id="player"></div>
+  <div class="info">
+    <h2 id="mTitle"></h2>
+    <p class="meta" id="mMeta"></p>
+    <p id="mDesc"></p>
+  </div>
+</dialog>
+
+<footer>Sirf wahi movies jinke rights hamare paas hain.</footer>
+
+<script>
+const grid = document.getElementById("grid");
+const dlg = document.getElementById("dlg");
+const player = document.getElementById("player");
+const input = document.getElementById("q");
+let timer;
+
+const posterOf = (m) =>
+  m.poster || (m.youtube ? `https://img.youtube.com/vi/${m.youtube}/hqdefault.jpg` : "");
+
+async function load(q = "") {
+  try {
+    const res = await fetch("/api/movies?q=" + encodeURIComponent(q));
+    if (!res.ok) throw new Error();
+    render(await res.json());
+  } catch {
+    grid.innerHTML = '<p class="empty">Movies load nahi hui. Page refresh karke dekho.</p>';
+  }
+}
+
+function render(list) {
+  grid.innerHTML = "";
+  if (!list.length) {
+    grid.innerHTML = '<p class="empty">Kuch nahi mila. Dusra naam try karo.</p>';
+    return;
+  }
+  for (const m of list) {
+    const b = document.createElement("button");
+    b.className = "card";
+    const img = document.createElement("img");
+    img.className = "poster";
+    img.loading = "lazy";
+    img.alt = m.title + " ka poster";
+    img.src = posterOf(m);
+    const h = document.createElement("h3");
+    h.textContent = m.title;
+    const p = document.createElement("p");
+    p.textContent = [m.year, m.genre].filter(Boolean).join(", ");
+    b.append(img, h, p);
+    b.onclick = () => open(m);
+    grid.append(b);
+  }
+}
+
+function open(m) {
+  player.innerHTML = "";
+  let el;
+  if (m.youtube) {
+    el = document.createElement("iframe");
+    el.src = `https://www.youtube.com/embed/${m.youtube}?autoplay=1`;
+    el.allow = "autoplay; fullscreen";
+    el.allowFullscreen = true;
+  } else {
+    el = document.createElement("video");
+    el.src = m.video_url;
+    el.controls = true;
+    el.autoplay = true;
+    el.poster = m.poster || "";
+  }
+  player.append(el);
+  document.getElementById("mTitle").textContent = m.title;
+  document.getElementById("mMeta").textContent = [m.year, m.genre].filter(Boolean).join(", ");
+  document.getElementById("mDesc").textContent = m.description || "";
+  dlg.showModal();
+}
+
+function stop() { player.innerHTML = ""; }
+document.getElementById("close").onclick = () => dlg.close();
+dlg.addEventListener("close", stop);
+dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
+input.addEventListener("input", () => {
+  clearTimeout(timer);
+  timer = setTimeout(() => load(input.value), 250);
+});
+
+load();
+</script>
+</body>
+</html>

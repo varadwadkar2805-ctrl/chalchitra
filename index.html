@@ -131,56 +131,17 @@ let timer;
 const posterOf = (m) =>
   m.poster || (m.youtube ? `https://img.youtube.com/vi/${m.youtube}/hqdefault.jpg` : "");
 
-const BACKUP = [
-  {
-    "id": 1,
-    "title": "Big Buck Bunny",
-    "year": 2008,
-    "genre": "Animation",
-    "description": "Ek bada sa khargosh teen shararati jaanwaron se badla leta hai.",
-    "poster": "https://img.youtube.com/vi/aqz-KE-bpKQ/hqdefault.jpg",
-    "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-  },
-  {
-    "id": 2,
-    "title": "Sintel",
-    "year": 2010,
-    "genre": "Fantasy",
-    "description": "Ek ladki apne khoye hue dragon ko dhoondhne nikalti hai.",
-    "poster": "https://img.youtube.com/vi/eRsGyueVLvQ/hqdefault.jpg",
-    "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
-  },
-  {
-    "id": 3,
-    "title": "Tears of Steel",
-    "year": 2012,
-    "genre": "Sci-Fi",
-    "description": "Future ke Amsterdam mein scientists robots se duniya bachane ki koshish karte hain.",
-    "poster": "https://img.youtube.com/vi/R6MlUcmOul8/hqdefault.jpg",
-    "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
-  },
-  {
-    "id": 4,
-    "title": "Elephants Dream",
-    "year": 2006,
-    "genre": "Animation",
-    "description": "Do kirdaar ek ajeeb si mashin-duniya mein phans jaate hain.",
-    "poster": "https://img.youtube.com/vi/TLkA0RELQ1g/hqdefault.jpg",
-    "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
-  }
-];
-
 async function load(q = "") {
   let all;
-  for (const url of ["/movies.json", "/data/movies.json"]) {
+  for (const url of ["/api/movies", "/movies.json", "/data/movies.json"]) {
     try {
-      const res = await fetch(url + "?v=" + Date.now());
+      const res = await fetch(url + (url.includes("?") ? "&" : "?") + "v=" + Date.now());
       if (!res.ok) continue;
-      all = await res.json();
-      break;
+      const data = await res.json();
+      if (Array.isArray(data)) { all = data; break; }
     } catch {}
   }
-  if (!all) all = BACKUP;
+  if (!all) all = [];
   const t = q.toLowerCase().trim();
   render(t ? all.filter((m) => [m.title, m.genre, m.description].join(" ").toLowerCase().includes(t)) : all);
 }
@@ -209,35 +170,18 @@ function render(list) {
   }
 }
 
-function ytIframe(id) {
-  const f = document.createElement("iframe");
-  f.src = `https://www.youtube.com/embed/${id}?autoplay=1`;
-  f.allow = "autoplay; fullscreen; encrypted-media";
-  f.referrerPolicy = "strict-origin-when-cross-origin";
-  f.allowFullscreen = true;
-  return f;
-}
-
 function openMovie(m) {
   player.innerHTML = "";
-  let el;
-  const ytId = m.youtube || ((m.poster || "").match(/img\.youtube\.com\/vi\/([^/]+)/) || [])[1];
-  if (m.youtube && !m.video_url) {
-    el = ytIframe(m.youtube);
-  } else {
-    el = document.createElement("video");
-    el.src = m.video_url;
-    el.controls = true;
-    el.autoplay = true;
-    el.playsInline = true;
-    el.poster = m.poster || "";
-    el.addEventListener("error", () => {
-      player.innerHTML = ytId
-        ? ""
-        : '<p class="empty" style="padding:20px">Video load nahi hui. video_url link check karo.</p>';
-      if (ytId) player.append(ytIframe(ytId));
-    });
-  }
+  const el = document.createElement("video");
+  el.src = m.video_url;
+  el.controls = true;
+  el.autoplay = true;
+  el.playsInline = true;
+  el.setAttribute("controlsList", "nodownload");
+  el.poster = m.poster || "";
+  el.addEventListener("error", () => {
+    player.innerHTML = '<p class="empty" style="padding:20px">Video load nahi hui. video_url ka link check karo.</p>';
+  });
   player.append(el);
   document.getElementById("mTitle").textContent = m.title;
   document.getElementById("mMeta").textContent = [m.year, m.genre].filter(Boolean).join(", ");

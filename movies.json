@@ -1,11 +1,12 @@
 [
   {
     "id": 1,
-    "title": "jailer",
-    "year": 2026,
-    "genre": "Action",
+    "title": "Big Buck Bunny",
+    "year": 2008,
+    "genre": "Animation",
     "description": "Ek bada sa khargosh teen shararati jaanwaron se badla leta hai.",
-    "youtube": "https://interlinecustomroofingllc.com/4/e16bce29bcf8cba52c75dfc9c22c47c2?refer=https%3A%2F%2F10moviesz.mom%2F%3Fid%3Db26d2d09%26step%3Dservers&kw=%5B%2210moviez%22%2C%22protector%22%2C%22-%22%2C%22multi%22%2C%22step%22%5D&scrWidth=360&scrHeight=788&tz=5.5&ship=1&v=2026.10.18_9345&sub3=invoke_layer&res=14.245&dev=r&ifid=01a15ddc-85a8-71d2-b773-4bf56d869e88&ibid=01a15ddc-850a-7ccb-bd05-1dd4f170dc3b&uidm=01a0c9b8-f046-7ce9-a1de-22a27b87476a_2"
+    "poster": "https://img.youtube.com/vi/aqz-KE-bpKQ/hqdefault.jpg",
+    "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
   },
   {
     "id": 2,
@@ -13,7 +14,8 @@
     "year": 2010,
     "genre": "Fantasy",
     "description": "Ek ladki apne khoye hue dragon ko dhoondhne nikalti hai.",
-    "youtube": "eRsGyueVLvQ"
+    "poster": "https://img.youtube.com/vi/eRsGyueVLvQ/hqdefault.jpg",
+    "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
   },
   {
     "id": 3,
@@ -21,7 +23,8 @@
     "year": 2012,
     "genre": "Sci-Fi",
     "description": "Future ke Amsterdam mein scientists robots se duniya bachane ki koshish karte hain.",
-    "youtube": "R6MlUcmOul8"
+    "poster": "https://img.youtube.com/vi/R6MlUcmOul8/hqdefault.jpg",
+    "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
   },
   {
     "id": 4,
@@ -29,6 +32,7 @@
     "year": 2006,
     "genre": "Animation",
     "description": "Do kirdaar ek ajeeb si mashin-duniya mein phans jaate hain.",
-    "youtube": "TLkA0RELQ1g"
+    "poster": "https://img.youtube.com/vi/TLkA0RELQ1g/hqdefault.jpg",
+    "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
   }
 ]
